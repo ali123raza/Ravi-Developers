@@ -3,39 +3,64 @@
 import { CheckCircle, TrendingUp, Users, Award, Building } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import MetaTags from "@/components/MetaTags";
 import { Link } from 'wouter';
 import { useSettings } from "@/hooks/useSettings";
+import { useSections } from "@/hooks/useSections";
 import { PLACEHOLDER_IMAGE, PLACEHOLDER_HERO_IMAGE } from "@/lib/utils";
 import { useGetDashboardStats } from "@/lib/api";
 export default function AboutPage() {
   const { data: settings } = useSettings();
   const { data: stats } = useGetDashboardStats();
-  const statsData = stats;
+  const sec = useSections("about");
 
   const hero = settings?.hero_content;
   const about = settings?.about_content;
   const companyStats = settings?.company_stats;
-  
-  // Get about images from settings
-  const aboutImages = (about as any)?.about_images || [];
+
+  // Get about images from settings or CMS sections
+  const aboutImages = (about as any)?.about_images || sec.getImages("story") || [];
   const firstAboutImage = aboutImages[0] || PLACEHOLDER_IMAGE;
+
+  // CMS section content
+  const storyContent = sec.getContent("story");
+  const mvContent = sec.getContent("mission_vision");
+  const valuesContent = sec.getContent("values");
+
+  // Story paragraphs from CMS or settings
+  const storyParagraphs = (storyContent?.paragraphs as string[] | undefined) ?? [about?.story, about?.story2, about?.story3].filter(Boolean) as string[];
+
+  // Values from CMS or fallback
+  const values = (valuesContent?.values as { title: string; desc: string }[] | undefined) ?? [
+    { title: "TMA Approved Projects", desc: "Full legal compliance with Tehsil Municipal Administration. No worries about legality." },
+    { title: "Residential Plots", desc: "3, 4, 5, 6, 10, 20 Marla residential plots designed for modern family living." },
+    { title: "Commercial Plots", desc: "Plots in prime locations for business and investment opportunities." },
+    { title: "Farmhouse Plots", desc: "4 Kanal and 8 Kanal farmhouse plots for luxurious countryside living." },
+    { title: "4-Year Installment Plan", desc: "Easy payment plans with minimal down payment. Own your plot without financial strain." },
+    { title: "After-Sale Support", desc: "Our team stays with you even after your purchase. We are a relationship-driven business." },
+  ];
+
+  const valueIcons = [CheckCircle, Building, Building, Building, TrendingUp, Users];
 
   return (
     <div className="min-h-screen flex flex-col">
+      <MetaTags page="about" />
       <Navbar />
 
       {/* Hero */}
+      {sec.isActive("hero") && (
       <section className="bg-gray-900 text-white py-16 relative overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <img src={hero?.hero_image || PLACEHOLDER_HERO_IMAGE} alt="" className="w-full h-full object-cover" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-bold mb-3">About Ravi Developers</h1>
+          <h1 className="text-4xl font-bold mb-3">{sec.getTitle("hero") || "About Ravi Developers"}</h1>
           <p className="text-gray-300 max-w-2xl mx-auto text-lg">
-            Building trust, communities, and dreams in Rahim Yar Khan.
+            {sec.getSubtitle("hero") || "Building trust, communities, and dreams in Rahim Yar Khan."}
           </p>
         </div>
       </section>
+      )}
 
       {/* Stats Bar */}
       <section className="bg-red-600 text-white py-6">
@@ -57,16 +82,21 @@ export default function AboutPage() {
       </section>
 
       {/* Our Story */}
+      {sec.isActive("story") && (
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <p className="text-red-600 text-sm font-semibold uppercase tracking-wider mb-2">Our Story</p>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">A Legacy of Trust in Rahim Yar Khan</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">{sec.getTitle("story") || "A Legacy of Trust in Rahim Yar Khan"}</h2>
               <div className="space-y-4 text-gray-600 leading-relaxed">
-                <p>{about?.story ?? ""}</p>
-                <p>{about?.story2 ?? ""}</p>
-                <p>{about?.story3 ?? ""}</p>
+                {storyParagraphs.length > 0 ? storyParagraphs.map((p, i) => <p key={i}>{p}</p>) : (
+                  <>
+                    <p>{about?.story ?? ""}</p>
+                    <p>{about?.story2 ?? ""}</p>
+                    <p>{about?.story3 ?? ""}</p>
+                  </>
+                )}
               </div>
             </div>
             <div className="relative">
@@ -83,8 +113,10 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+      )}
 
       {/* Mission & Vision */}
+      {sec.isActive("mission_vision") && (
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8">
@@ -94,7 +126,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Our Mission</h3>
               <p className="text-gray-600 leading-relaxed">
-                {about?.mission || "To provide premium, affordable, and TMA-approved residential and commercial plots in Rahim Yar Khan, enabling families and investors to secure their future with confidence."}
+                {(mvContent?.mission as string) ?? about?.mission ?? "To provide premium, affordable, and TMA-approved residential and commercial plots in Rahim Yar Khan, enabling families and investors to secure their future with confidence."}
               </p>
             </div>
             <div className="bg-white p-8 rounded-xl border border-gray-200">
@@ -103,39 +135,38 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Our Vision</h3>
               <p className="text-gray-600 leading-relaxed">
-                {about?.vision || "To be the leading real estate developer in South Punjab, creating sustainable, well-planned communities where families thrive and investments grow."}
+                {(mvContent?.vision as string) ?? about?.vision ?? "To be the leading real estate developer in South Punjab, creating sustainable, well-planned communities where families thrive and investments grow."}
               </p>
             </div>
           </div>
         </div>
       </section>
+      )}
 
-      {/* What We Offer */}
+      {/* What We Offer / Values */}
+      {sec.isActive("values") && (
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-gray-900">What Sets Us Apart</h2>
+            <h2 className="text-3xl font-bold text-gray-900">{sec.getTitle("values") || "What Sets Us Apart"}</h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { icon: <CheckCircle size={20} className="text-red-600" />, title: "TMA Approved Projects", desc: "Full legal compliance with Tehsil Municipal Administration. No worries about legality." },
-              { icon: <Building size={20} className="text-red-600" />, title: "Residential Plots", desc: "3, 4, 5, 6, 10, 20 Marla residential plots designed for modern family living." },
-              { icon: <Building size={20} className="text-red-600" />, title: "Commercial Plots", desc: "Plots in prime locations for business and investment opportunities." },
-              { icon: <Building size={20} className="text-red-600" />, title: "Farmhouse Plots", desc: "4 Kanal and 8 Kanal farmhouse plots for luxurious countryside living." },
-              { icon: <TrendingUp size={20} className="text-red-600" />, title: "4-Year Installment Plan", desc: "Easy payment plans with minimal down payment. Own your plot without financial strain." },
-              { icon: <Users size={20} className="text-red-600" />, title: "After-Sale Support", desc: "Our team stays with you even after your purchase. We are a relationship-driven business." },
-            ].map((item, i) => (
-              <div key={i} className="p-6 border border-gray-200 rounded-xl hover:border-red-200 hover:shadow-sm transition-all">
-                <div className="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center mb-3">
-                  {item.icon}
+            {values.map((item, i) => {
+              const Icon = valueIcons[i % valueIcons.length];
+              return (
+                <div key={i} className="p-6 border border-gray-200 rounded-xl hover:border-red-200 hover:shadow-sm transition-all">
+                  <div className="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center mb-3">
+                    <Icon size={20} className="text-red-600" />
+                  </div>
+                  <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">{item.desc}</p>
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
+      )}
 
       {/* CTA */}
       <section className="bg-gray-900 py-12">

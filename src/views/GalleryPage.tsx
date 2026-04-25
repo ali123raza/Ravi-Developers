@@ -4,9 +4,12 @@ import { useState } from "react";
 import { X, ZoomIn } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import MetaTags from "@/components/MetaTags";
 import { useGetProjects } from "@/lib/api";
+import { useSections } from "@/hooks/useSections";
 export default function GalleryPage() {
   const { data: projects } = useGetProjects();
+  const sec = useSections("gallery");
   const [activeProject, setActiveProject] = useState("all");
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
 
@@ -20,16 +23,19 @@ export default function GalleryPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <MetaTags page="gallery" />
       <Navbar />
 
+      {sec.isActive("hero") && (
       <section className="bg-gray-900 text-white py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-bold mb-3">Photo Gallery</h1>
+          <h1 className="text-4xl font-bold mb-3">{sec.getTitle("hero") || "Photo Gallery"}</h1>
           <p className="text-gray-300 max-w-xl mx-auto">
-            Explore our housing society developments, infrastructure, and project progress.
+            {sec.getSubtitle("hero") || "Explore our housing society developments, infrastructure, and project progress."}
           </p>
         </div>
       </section>
+      )}
 
       {/* Filter Tabs */}
       <section className="bg-white border-b border-gray-200 py-4">

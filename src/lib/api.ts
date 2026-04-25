@@ -4,6 +4,24 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const API_BASE = "/api";
 
+// Types
+export interface Project {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  location?: string;
+  totalArea?: string;
+  status?: string;
+  images?: string[];
+  features?: string[];
+  launchDate?: string;
+  completionDate?: string;
+  startingPrice?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 // Helper to get admin auth token from localStorage
 const getAdminToken = () => {
   if (typeof window === "undefined") return null;
@@ -64,7 +82,7 @@ const deleteProject = async (id: string) => {
 };
 
 export const useGetProjects = () =>
-  useQuery({ queryKey: ["projects"], queryFn: getProjects });
+  useQuery<Project[]>({ queryKey: ["projects"], queryFn: getProjects });
 
 export const useGetProject = (id: string) =>
   useQuery({ queryKey: ["project", id], queryFn: () => getProject(id), enabled: !!id });
@@ -299,6 +317,399 @@ export const useDeleteTestimonial = () => {
 };
 
 export const getGetTestimonialsQueryKey = () => ["testimonials"];
+
+// ========== SECTIONS ==========
+export interface PageSection {
+  id: string;
+  page: string;
+  sectionKey: string;
+  title: string | null;
+  subtitle: string | null;
+  content: Record<string, unknown>;
+  images: string[];
+  buttons: { text: string; link: string; variant: string }[];
+  displayOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const getSections = async (page?: string) => {
+  const url = page ? `${API_BASE}/sections?page=${page}` : `${API_BASE}/sections`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Failed to fetch sections");
+  return res.json();
+};
+
+const getSection = async (id: string) => {
+  const res = await fetch(`${API_BASE}/sections/${id}`);
+  if (!res.ok) throw new Error("Failed to fetch section");
+  return res.json();
+};
+
+const createSection = async (data: unknown) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/sections`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to create section");
+  return res.json();
+};
+
+const updateSection = async ({ id, data }: { id: string; data: unknown }) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/sections/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update section");
+  return res.json();
+};
+
+const deleteSection = async (id: string) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/sections/${id}`, {
+    method: "DELETE",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to delete section");
+  return res.json();
+};
+
+const reorderSections = async (sections: { id: string; displayOrder: number }[]) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/sections/reorder`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ sections }),
+  });
+  if (!res.ok) throw new Error("Failed to reorder sections");
+  return res.json();
+};
+
+export const useGetSections = (page?: string) =>
+  useQuery<PageSection[]>({ queryKey: ["sections", page], queryFn: () => getSections(page) });
+
+export const useGetSection = (id: string) =>
+  useQuery<PageSection>({ queryKey: ["section", id], queryFn: () => getSection(id), enabled: !!id });
+
+export const useCreateSection = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: createSection,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["sections"] }),
+  });
+};
+
+export const useUpdateSection = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: updateSection,
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({ queryKey: ["sections"] });
+      qc.invalidateQueries({ queryKey: ["section", vars.id] });
+    },
+  });
+};
+
+export const useDeleteSection = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: string }) => deleteSection(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["sections"] }),
+  });
+};
+
+export const useReorderSections = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: reorderSections,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["sections"] }),
+  });
+};
+
+// ========== THEME ==========
+export interface ThemeSettings {
+  colors: {
+    primary: string; primaryHover: string; primaryLight: string;
+    secondary: string; secondaryHover: string;
+    background: { main: string; alt: string; dark: string };
+    text: { primary: string; secondary: string; light: string; white: string };
+    border: { light: string; medium: string };
+    accent: { success: string; warning: string; error: string };
+  };
+  typography: { fontFamily: string; fontHeading: string };
+  assets: { logoUrl: string; logoDarkUrl: string; faviconUrl: string };
+  updatedAt: string;
+}
+
+const getTheme = async () => {
+  const res = await fetch(`${API_BASE}/theme`);
+  if (!res.ok) throw new Error("Failed to fetch theme");
+  return res.json();
+};
+
+const updateTheme = async (data: Record<string, string>) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/theme`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update theme");
+  return res.json();
+};
+
+export const useGetTheme = () =>
+  useQuery<ThemeSettings>({ queryKey: ["theme"], queryFn: getTheme });
+
+export const useUpdateTheme = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: updateTheme,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["theme"] }),
+  });
+};
+
+// ========== NAVIGATION ==========
+export interface NavItem {
+  id: string;
+  label: string;
+  href: string;
+  parentId: string | null;
+  displayOrder: number;
+  isActive: boolean;
+  isExternal: boolean;
+  icon: string | null;
+  children?: NavItem[];
+}
+
+const getNavigation = async () => {
+  const res = await fetch(`${API_BASE}/navigation`);
+  if (!res.ok) throw new Error("Failed to fetch navigation");
+  return res.json();
+};
+
+const getNavigationFlat = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/navigation/flat`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch navigation");
+  return res.json();
+};
+
+const createNavItem = async (data: unknown) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/navigation`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to create navigation item");
+  return res.json();
+};
+
+const updateNavItem = async ({ id, data }: { id: string; data: unknown }) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/navigation/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update navigation item");
+  return res.json();
+};
+
+const deleteNavItem = async (id: string) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/navigation/${id}`, {
+    method: "DELETE",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to delete navigation item");
+  return res.json();
+};
+
+const reorderNavigation = async (items: { id: string; displayOrder: number }[]) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/navigation/reorder`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ items }),
+  });
+  if (!res.ok) throw new Error("Failed to reorder navigation");
+  return res.json();
+};
+
+export const useGetNavigation = () =>
+  useQuery<NavItem[]>({ queryKey: ["navigation"], queryFn: getNavigation });
+
+export const useGetNavigationFlat = () =>
+  useQuery<NavItem[]>({ queryKey: ["navigation-flat"], queryFn: getNavigationFlat });
+
+export const useCreateNavItem = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: createNavItem,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["navigation"] });
+      qc.invalidateQueries({ queryKey: ["navigation-flat"] });
+    },
+  });
+};
+
+export const useUpdateNavItem = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: updateNavItem,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["navigation"] });
+      qc.invalidateQueries({ queryKey: ["navigation-flat"] });
+    },
+  });
+};
+
+export const useDeleteNavItem = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: string }) => deleteNavItem(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["navigation"] });
+      qc.invalidateQueries({ queryKey: ["navigation-flat"] });
+    },
+  });
+};
+
+export const useReorderNavigation = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: reorderNavigation,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["navigation"] });
+      qc.invalidateQueries({ queryKey: ["navigation-flat"] });
+    },
+  });
+};
+
+// ========== SEO ==========
+export interface SEOSettings {
+  id: string;
+  page: string;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  metaKeywords: string | null;
+  ogTitle: string | null;
+  ogDescription: string | null;
+  ogImage: string | null;
+  canonicalUrl: string | null;
+  robotsMeta: string;
+  updatedAt: string;
+}
+
+const getSEOSettings = async () => {
+  const res = await fetch(`${API_BASE}/seo`);
+  if (!res.ok) throw new Error("Failed to fetch SEO settings");
+  return res.json();
+};
+
+const getSEOByPage = async (page: string) => {
+  const res = await fetch(`${API_BASE}/seo/page/${page}`);
+  if (!res.ok) throw new Error("Failed to fetch SEO for page");
+  return res.json();
+};
+
+const createSEO = async (data: unknown) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/seo`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to create SEO settings");
+  return res.json();
+};
+
+const updateSEO = async ({ id, data }: { id: string; data: unknown }) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/seo/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update SEO settings");
+  return res.json();
+};
+
+const deleteSEO = async (id: string) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/seo/${id}`, {
+    method: "DELETE",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to delete SEO settings");
+  return res.json();
+};
+
+export const useGetSEOSettings = () =>
+  useQuery<SEOSettings[]>({ queryKey: ["seo"], queryFn: getSEOSettings });
+
+export const useGetSEOByPage = (page: string) =>
+  useQuery<SEOSettings>({ queryKey: ["seo", page], queryFn: () => getSEOByPage(page), enabled: !!page });
+
+export const useCreateSEO = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: createSEO,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["seo"] }),
+  });
+};
+
+export const useUpdateSEO = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: updateSEO,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["seo"] }),
+  });
+};
+
+export const useDeleteSEO = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: string }) => deleteSEO(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["seo"] }),
+  });
+};
 
 // ========== DASHBOARD ==========
 const getDashboardStats = async () => {

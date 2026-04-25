@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Link } from 'wouter';
 import { useLocation } from 'wouter';
 import {
-  LayoutDashboard, Building2, Home, MessageSquare, Star, Menu, X, LogOut, ChevronRight, Settings
+  LayoutDashboard, Building2, Home, MessageSquare, Star, Menu, X, LogOut, ChevronRight, Settings, FileText, Palette, Navigation, Search
 } from "lucide-react";
 import { useSettings } from "@/hooks/useSettings";
 import { useAdminAuth } from "@/contexts/AuthContext";
@@ -16,6 +16,10 @@ const navItems = [
   { href: "/admin/plots", label: "Plots", icon: <Home size={16} /> },
   { href: "/admin/inquiries", label: "Inquiries", icon: <MessageSquare size={16} /> },
   { href: "/admin/testimonials", label: "Testimonials", icon: <Star size={16} /> },
+  { href: "/admin/cms", label: "CMS Pages", icon: <FileText size={16} /> },
+  { href: "/admin/theme", label: "Theme", icon: <Palette size={16} /> },
+  { href: "/admin/navigation", label: "Navigation", icon: <Navigation size={16} /> },
+  { href: "/admin/seo", label: "SEO", icon: <Search size={16} /> },
   { href: "/admin/settings", label: "Site Settings", icon: <Settings size={16} /> },
 ];
 

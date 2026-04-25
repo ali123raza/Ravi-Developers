@@ -21,6 +21,11 @@ import AdminPlotForm from "@/views/admin/AdminPlotForm";
 import AdminInquiries from "@/views/admin/AdminInquiries";
 import AdminTestimonials from "@/views/admin/AdminTestimonials";
 import AdminSettings from "@/views/admin/AdminSettings";
+import AdminCMS from "@/views/admin/AdminCMS";
+import AdminTheme from "@/views/admin/AdminTheme";
+import AdminNavigation from "@/views/admin/AdminNavigation";
+import AdminSEO from "@/views/admin/AdminSEO";
+import ThemeProvider from "@/components/ThemeProvider";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
 const queryClient = new QueryClient({
@@ -77,6 +82,18 @@ function Router() {
       <Route path="/admin/settings">
         {() => <ProtectedRoute><AdminSettings /></ProtectedRoute>}
       </Route>
+      <Route path="/admin/cms">
+        {() => <ProtectedRoute><AdminCMS /></ProtectedRoute>}
+      </Route>
+      <Route path="/admin/theme">
+        {() => <ProtectedRoute><AdminTheme /></ProtectedRoute>}
+      </Route>
+      <Route path="/admin/navigation">
+        {() => <ProtectedRoute><AdminNavigation /></ProtectedRoute>}
+      </Route>
+      <Route path="/admin/seo">
+        {() => <ProtectedRoute><AdminSEO /></ProtectedRoute>}
+      </Route>
 
       <Route component={NotFound} />
     </Switch>
@@ -87,13 +104,15 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AdminAuthProvider>
-        <TooltipProvider>
-          <WouterRouter base={(process.env.NEXT_PUBLIC_BASE_URL || "/").replace(/\/$/, "")}>
-            <Router />
-            <WhatsAppButton />
-          </WouterRouter>
-          <Toaster />
-        </TooltipProvider>
+        <ThemeProvider>
+          <TooltipProvider>
+            <WouterRouter base={(process.env.NEXT_PUBLIC_BASE_URL || "/").replace(/\/$/, "")}>
+              <Router />
+              <WhatsAppButton />
+            </WouterRouter>
+            <Toaster />
+          </TooltipProvider>
+        </ThemeProvider>
       </AdminAuthProvider>
     </QueryClientProvider>
   );

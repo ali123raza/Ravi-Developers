@@ -6,8 +6,10 @@ import { z } from "zod";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import MetaTags from "@/components/MetaTags";
 import { useToast } from "@/hooks/use-toast";
 import { useSettings } from "@/hooks/useSettings";
+import { useSections } from "@/hooks/useSections";
 import { useCreateInquiry } from "@/lib/api";
 import { DEFAULT_MAPS_EMBED_URL } from "@/lib/utils";
 
@@ -23,6 +25,7 @@ export default function ContactPage() {
   const { toast } = useToast();
   const createInquiry = useCreateInquiry();
   const { data: settings } = useSettings();
+  const sec = useSections("contact");
   const contact = settings?.contact_info;
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) });
 
@@ -50,16 +53,19 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <MetaTags page="contact" />
       <Navbar />
 
+      {sec.isActive("hero") && (
       <section className="bg-gray-900 text-white py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-bold mb-3">Contact Us</h1>
+          <h1 className="text-4xl font-bold mb-3">{sec.getTitle("hero") || "Contact Us"}</h1>
           <p className="text-gray-300 max-w-xl mx-auto">
-            Our team is ready to assist you. Reach out for property inquiries, site visits, or general information.
+            {sec.getSubtitle("hero") || "Our team is ready to assist you. Reach out for property inquiries, site visits, or general information."}
           </p>
         </div>
       </section>
+      )}
 
       <main className="flex-1 py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -67,7 +73,7 @@ export default function ContactPage() {
             {/* Contact Info */}
             <div className="space-y-5">
               <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <h3 className="font-bold text-gray-900 mb-4">Get in Touch</h3>
+                <h3 className="font-bold text-gray-900 mb-4">{sec.getTitle("info") || "Get in Touch"}</h3>
                 <ul className="space-y-4">
                   <li className="flex gap-3">
                     <div className="w-9 h-9 bg-red-50 rounded-lg flex items-center justify-center shrink-0">
@@ -121,7 +127,7 @@ export default function ContactPage() {
             {/* Contact Form */}
             <div className="lg:col-span-2">
               <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <h3 className="font-bold text-gray-900 mb-5 text-lg">Send Us a Message</h3>
+                <h3 className="font-bold text-gray-900 mb-5 text-lg">{sec.getTitle("form") || "Send Us a Message"}</h3>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
