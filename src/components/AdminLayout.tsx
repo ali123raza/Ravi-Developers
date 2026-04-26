@@ -5,21 +5,32 @@ import { useState } from "react";
 import { Link } from 'wouter';
 import { useLocation } from 'wouter';
 import {
-  LayoutDashboard, Building2, Home, MessageSquare, Star, Menu, X, LogOut, ChevronRight, Settings, FileText, Palette, Navigation, Search
+  LayoutDashboard, Building2, Home, MessageSquare, Star, Menu, X, LogOut, ChevronRight, Settings, FileText, Palette, Navigation, Search, Users, Image, Folder, Activity, CreditCard, UserCircle, BarChart3, Megaphone, Shield, Bell
 } from "lucide-react";
 import { useSettings } from "@/hooks/useSettings";
 import { useAdminAuth } from "@/contexts/AuthContext";
+import NotificationCenter from "./NotificationCenter";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: <LayoutDashboard size={16} /> },
   { href: "/admin/projects", label: "Projects", icon: <Building2 size={16} /> },
   { href: "/admin/plots", label: "Plots", icon: <Home size={16} /> },
   { href: "/admin/inquiries", label: "Inquiries", icon: <MessageSquare size={16} /> },
+  { href: "/admin/bookings", label: "Bookings", icon: <CreditCard size={16} /> },
+  { href: "/admin/customers", label: "Customers", icon: <UserCircle size={16} /> },
   { href: "/admin/testimonials", label: "Testimonials", icon: <Star size={16} /> },
+  { href: "/admin/reports", label: "Reports", icon: <BarChart3 size={16} /> },
+  { href: "/admin/marketing", label: "Marketing", icon: <Megaphone size={16} /> },
   { href: "/admin/cms", label: "CMS Pages", icon: <FileText size={16} /> },
   { href: "/admin/theme", label: "Theme", icon: <Palette size={16} /> },
   { href: "/admin/navigation", label: "Navigation", icon: <Navigation size={16} /> },
   { href: "/admin/seo", label: "SEO", icon: <Search size={16} /> },
+  { href: "/admin/gallery", label: "Gallery", icon: <Image size={16} /> },
+  { href: "/admin/files", label: "Files", icon: <Folder size={16} /> },
+  { href: "/admin/logs", label: "Activity Logs", icon: <Activity size={16} /> },
+  { href: "/admin/users", label: "Users", icon: <Users size={16} /> },
+  { href: "/admin/system", label: "System", icon: <Shield size={16} /> },
+  { href: "/admin/notifications", label: "Notifications", icon: <Bell size={16} /> },
   { href: "/admin/settings", label: "Site Settings", icon: <Settings size={16} /> },
 ];
 
@@ -107,15 +118,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Main Content */}
       <div className="flex-1 lg:ml-60 flex flex-col">
         {/* Top bar */}
-        <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 sticky top-0 z-20">
-          <button
-            className="lg:hidden text-gray-600 hover:text-gray-900"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-          <div className="text-sm text-gray-500">
-            {navItems.find((item) => pathname === item.href || (item.href !== "/admin" && pathname?.startsWith(item.href)))?.label ?? "Admin Panel"}
+        <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between gap-3 sticky top-0 z-20">
+          <div className="flex items-center gap-3">
+            <button
+              className="lg:hidden text-gray-600 hover:text-gray-900"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+            <div className="text-sm text-gray-500">
+              {navItems.find((item) => pathname === item.href || (item.href !== "/admin" && pathname?.startsWith(item.href)))?.label ?? "Admin Panel"}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <NotificationCenter />
           </div>
         </header>
 

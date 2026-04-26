@@ -5,8 +5,8 @@ import AdminLayout from "@/components/AdminLayout";
 import { useQueryClient } from "@tanstack/react-query";
 import { getStatusColor } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { useGetInquiries, useUpdateInquiry, getGetInquiriesQueryKey } from "@/lib/api";
+import { ChevronDown, ChevronUp, UserPlus } from "lucide-react";
+import { useGetInquiries, useUpdateInquiry, getGetInquiriesQueryKey, useConvertInquiryToCustomer } from "@/lib/api";
 
 interface Inquiry {
   id: string;
@@ -27,6 +27,7 @@ export default function AdminInquiries() {
   const [notes, setNotes] = useState<Record<string, string>>({});
   const { data: inquiries, isLoading } = useGetInquiries();
   const updateInquiry = useUpdateInquiry();
+  const convertToCustomer = useConvertInquiryToCustomer();
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -46,6 +47,21 @@ export default function AdminInquiries() {
         queryClient.invalidateQueries({ queryKey: getGetInquiriesQueryKey() });
         toast({ title: "Note saved" });
       },
+    });
+  };
+
+  const handleConvertToCustomer = (id: string) => {
+    if (!confirm("Convert this inquiry to a customer?")) return;
+    convertToCustomer.mutate(id, {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({ queryKey: getGetInquiriesQueryKey() });
+        if (data.existing) {
+          toast({ title: "Linked", description: "Inquiry linked to existing customer." });
+        } else {
+          toast({ title: "Converted", description: "Inquiry converted to customer successfully." });
+        }
+      },
+      onError: () => toast({ title: "Error", description: "Failed to convert inquiry.", variant: "destructive" }),
     });
   };
 
@@ -123,6 +139,16 @@ export default function AdminInquiries() {
                           <p className="text-sm text-gray-700 bg-gray-50 rounded p-3">{inq.message}</p>
                         </div>
                       )}
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleConvertToCustomer(inq.id)}
+                          disabled={convertToCustomer.isPending}
+                          className="flex items-center gap-1 text-xs bg-green-600 text-white px-3 py-1.5 rounded hover:bg-green-700 disabled:opacity-50"
+                        >
+                          <UserPlus size={12} />
+                          {convertToCustomer.isPending ? "Converting..." : "Convert to Customer"}
+                        </button>
+                      </div>
                       <div>
                         <div className="text-xs font-medium text-gray-500 mb-1">Notes</div>
                         <textarea

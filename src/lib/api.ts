@@ -734,3 +734,919 @@ export const useGetPlotsByStatus = () => {
     isLoading: !data,
   };
 };
+
+// ========== USERS ==========
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const getUsers = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/users`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch users");
+  return res.json();
+};
+
+const createUser = async (data: unknown) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/users`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to create user");
+  return res.json();
+};
+
+const updateUser = async ({ id, data }: { id: string; data: unknown }) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/users/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update user");
+  return res.json();
+};
+
+const deleteUser = async (id: string) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/users/${id}`, {
+    method: "DELETE",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to delete user");
+  return res.json();
+};
+
+export const useGetUsers = () =>
+  useQuery<User[]>({ queryKey: ["users"], queryFn: getUsers });
+
+export const useCreateUser = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: createUser,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["users"] }),
+  });
+};
+
+export const useUpdateUser = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: updateUser,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["users"] }),
+  });
+};
+
+export const useDeleteUser = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: string }) => deleteUser(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["users"] }),
+  });
+};
+
+export const getGetUsersQueryKey = () => ["users"];
+
+// ========== GALLERY ==========
+export interface GalleryImage {
+  id: string;
+  filename: string;
+  url: string;
+  category: string;
+  size: number;
+  createdAt: string;
+}
+
+const getGallery = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/gallery`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch gallery");
+  return res.json();
+};
+
+const deleteGalleryImage = async (id: string) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/gallery/${id}`, {
+    method: "DELETE",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to delete image");
+  return res.json();
+};
+
+export const useGetGallery = () =>
+  useQuery<GalleryImage[]>({ queryKey: ["gallery"], queryFn: getGallery });
+
+export const useDeleteGalleryImage = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: string }) => deleteGalleryImage(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["gallery"] }),
+  });
+};
+
+export const getGetGalleryQueryKey = () => ["gallery"];
+
+// ========== BOOKINGS ==========
+export interface Booking {
+  id: string;
+  plotId: string;
+  plotNumber: string;
+  projectName: string;
+  customerId: string;
+  customerName: string;
+  customerPhone: string;
+  status: string;
+  paymentStatus: string;
+  totalAmount: number;
+  paidAmount: number;
+  installmentCount: number;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+  payments?: Payment[];
+}
+
+export interface Payment {
+  id: string;
+  bookingId: string;
+  amount: number;
+  paymentDate: string;
+  paymentMethod: string;
+  receiptUrl: string;
+  notes: string;
+  createdAt: string;
+}
+
+const getBookings = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/bookings`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch bookings");
+  return res.json();
+};
+
+const getBooking = async (id: string) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/bookings/${id}`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch booking");
+  return res.json();
+};
+
+const createBooking = async (data: unknown) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/bookings`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to create booking");
+  return res.json();
+};
+
+const updateBooking = async ({ id, data }: { id: string; data: unknown }) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/bookings/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update booking");
+  return res.json();
+};
+
+const deleteBooking = async (id: string) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/bookings/${id}`, {
+    method: "DELETE",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to delete booking");
+  return res.json();
+};
+
+const addPayment = async ({ bookingId, data }: { bookingId: string; data: unknown }) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/bookings/${bookingId}/payments`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to add payment");
+  return res.json();
+};
+
+export const useGetBookings = () =>
+  useQuery<Booking[]>({ queryKey: ["bookings"], queryFn: getBookings });
+
+export const useGetBooking = (id: string) =>
+  useQuery<Booking>({ queryKey: ["booking", id], queryFn: () => getBooking(id), enabled: !!id });
+
+export const useCreateBooking = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: createBooking,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["bookings"] }),
+  });
+};
+
+export const useUpdateBooking = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: updateBooking,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["bookings"] }),
+  });
+};
+
+export const useDeleteBooking = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: string }) => deleteBooking(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["bookings"] }),
+  });
+};
+
+export const useAddPayment = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: addPayment,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["bookings"] }),
+  });
+};
+
+export const getGetBookingsQueryKey = () => ["bookings"];
+
+// ========== CUSTOMERS ==========
+export interface Customer {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  notes: string;
+  source: string;
+  status: string;
+  totalBookings: number;
+  totalPayments: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const getCustomers = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/customers`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch customers");
+  return res.json();
+};
+
+const getCustomer = async (id: string) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/customers/${id}`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch customer");
+  return res.json();
+};
+
+const createCustomer = async (data: unknown) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/customers`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to create customer");
+  return res.json();
+};
+
+const updateCustomer = async ({ id, data }: { id: string; data: unknown }) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/customers/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update customer");
+  return res.json();
+};
+
+const deleteCustomer = async (id: string) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/customers/${id}`, {
+    method: "DELETE",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to delete customer");
+  return res.json();
+};
+
+const convertInquiryToCustomer = async (inquiryId: string) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/customers/from-inquiry/${inquiryId}`, {
+    method: "POST",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to convert inquiry");
+  return res.json();
+};
+
+export const useGetCustomers = () =>
+  useQuery<Customer[]>({ queryKey: ["customers"], queryFn: getCustomers });
+
+export const useGetCustomer = (id: string) =>
+  useQuery({ queryKey: ["customer", id], queryFn: () => getCustomer(id), enabled: !!id });
+
+export const useCreateCustomer = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: createCustomer,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["customers"] }),
+  });
+};
+
+export const useUpdateCustomer = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: updateCustomer,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["customers"] }),
+  });
+};
+
+export const useDeleteCustomer = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: string }) => deleteCustomer(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["customers"] }),
+  });
+};
+
+export const useConvertInquiryToCustomer = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: convertInquiryToCustomer,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["customers"] });
+      qc.invalidateQueries({ queryKey: ["inquiries"] });
+    },
+  });
+};
+
+export const getGetCustomersQueryKey = () => ["customers"];
+
+// ========== REPORTS ==========
+const getSalesReport = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/reports/sales`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch sales report");
+  return res.json();
+};
+
+const getInquiryReport = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/reports/inquiries`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch inquiry report");
+  return res.json();
+};
+
+const getPlotsReport = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/reports/plots`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch plots report");
+  return res.json();
+};
+
+const getSummaryReport = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/reports/summary`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch summary");
+  return res.json();
+};
+
+export const useGetSalesReport = () =>
+  useQuery({ queryKey: ["reports", "sales"], queryFn: getSalesReport });
+
+export const useGetInquiryReport = () =>
+  useQuery({ queryKey: ["reports", "inquiries"], queryFn: getInquiryReport });
+
+export const useGetPlotsReport = () =>
+  useQuery({ queryKey: ["reports", "plots"], queryFn: getPlotsReport });
+
+export const useGetSummaryReport = () =>
+  useQuery({ queryKey: ["reports", "summary"], queryFn: getSummaryReport });
+
+// ========== NOTIFICATIONS ==========
+export interface Notification {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  entityType: string;
+  entityId: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+const getNotifications = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/notifications`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch notifications");
+  return res.json();
+};
+
+const getUnreadCount = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/notifications/unread-count`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch unread count");
+  return res.json();
+};
+
+const markNotificationRead = async (id: string) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/notifications/${id}/read`, {
+    method: "PUT",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to mark notification as read");
+  return res.json();
+};
+
+const markAllNotificationsRead = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/notifications/read-all`, {
+    method: "PUT",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to mark all as read");
+  return res.json();
+};
+
+const deleteNotification = async (id: string) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/notifications/${id}`, {
+    method: "DELETE",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to delete notification");
+  return res.json();
+};
+
+export const useGetNotifications = () =>
+  useQuery<Notification[]>({ queryKey: ["notifications"], queryFn: getNotifications });
+
+export const useGetUnreadCount = () =>
+  useQuery<{ count: number }>({ queryKey: ["notifications", "unread"], queryFn: getUnreadCount });
+
+export const useMarkNotificationRead = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: string }) => markNotificationRead(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+};
+
+export const useMarkAllNotificationsRead = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: markAllNotificationsRead,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+};
+
+export const useDeleteNotification = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: string }) => deleteNotification(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["notifications"] }),
+  });
+};
+
+// ========== MARKETING ==========
+export interface EmailCampaign {
+  id: string;
+  name: string;
+  subject: string;
+  content: string;
+  recipientType: string;
+  recipientCount: number;
+  sentCount: number;
+  status: string;
+  scheduledAt?: string;
+  sentAt?: string;
+  createdAt: string;
+}
+
+export interface SMSCampaign {
+  id: string;
+  name: string;
+  message: string;
+  recipientType: string;
+  recipientCount: number;
+  sentCount: number;
+  status: string;
+  sentAt?: string;
+  createdAt: string;
+}
+
+export interface Promotion {
+  id: string;
+  title: string;
+  description: string;
+  code: string;
+  discountType: "percentage" | "fixed";
+  discountValue: number;
+  minBookingAmount: number;
+  validFrom: string;
+  validUntil: string;
+  maxUses: number;
+  usedCount: number;
+  isActive: boolean;
+  createdAt: string;
+}
+
+const getEmailCampaigns = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/marketing/campaigns`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch campaigns");
+  return res.json();
+};
+
+const createEmailCampaign = async (data: unknown) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/marketing/campaigns`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to create campaign");
+  return res.json();
+};
+
+const sendEmailCampaign = async (id: string) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/marketing/campaigns/${id}/send`, {
+    method: "PUT",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to send campaign");
+  return res.json();
+};
+
+const deleteEmailCampaign = async (id: string) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/marketing/campaigns/${id}`, {
+    method: "DELETE",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to delete campaign");
+  return res.json();
+};
+
+const getSMSCampaigns = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/marketing/sms`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch SMS campaigns");
+  return res.json();
+};
+
+const createSMSCampaign = async (data: unknown) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/marketing/sms`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to create SMS campaign");
+  return res.json();
+};
+
+const sendSMSCampaign = async (id: string) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/marketing/sms/${id}/send`, {
+    method: "PUT",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to send SMS");
+  return res.json();
+};
+
+const deleteSMSCampaign = async (id: string) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/marketing/sms/${id}`, {
+    method: "DELETE",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to delete SMS campaign");
+  return res.json();
+};
+
+const getPromotions = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/marketing/promotions`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch promotions");
+  return res.json();
+};
+
+const createPromotion = async (data: unknown) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/marketing/promotions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to create promotion");
+  return res.json();
+};
+
+const updatePromotion = async ({ id, data }: { id: string; data: unknown }) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/marketing/promotions/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update promotion");
+  return res.json();
+};
+
+const deletePromotion = async (id: string) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/marketing/promotions/${id}`, {
+    method: "DELETE",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to delete promotion");
+  return res.json();
+};
+
+export const useGetEmailCampaigns = () =>
+  useQuery<EmailCampaign[]>({ queryKey: ["emailCampaigns"], queryFn: getEmailCampaigns });
+
+export const useCreateEmailCampaign = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: createEmailCampaign,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["emailCampaigns"] }),
+  });
+};
+
+export const useSendEmailCampaign = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: string }) => sendEmailCampaign(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["emailCampaigns"] }),
+  });
+};
+
+export const useDeleteEmailCampaign = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: string }) => deleteEmailCampaign(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["emailCampaigns"] }),
+  });
+};
+
+export const useGetSMSCampaigns = () =>
+  useQuery<SMSCampaign[]>({ queryKey: ["smsCampaigns"], queryFn: getSMSCampaigns });
+
+export const useCreateSMSCampaign = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: createSMSCampaign,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["smsCampaigns"] }),
+  });
+};
+
+export const useSendSMSCampaign = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: string }) => sendSMSCampaign(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["smsCampaigns"] }),
+  });
+};
+
+export const useDeleteSMSCampaign = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: string }) => deleteSMSCampaign(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["smsCampaigns"] }),
+  });
+};
+
+export const useGetPromotions = () =>
+  useQuery<Promotion[]>({ queryKey: ["promotions"], queryFn: getPromotions });
+
+export const useCreatePromotion = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: createPromotion,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["promotions"] }),
+  });
+};
+
+export const useUpdatePromotion = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: updatePromotion,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["promotions"] }),
+  });
+};
+
+export const useDeletePromotion = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: string }) => deletePromotion(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["promotions"] }),
+  });
+};
+
+// ========== SYSTEM ==========
+const getSystemHealth = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/system/health`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch system health");
+  return res.json();
+};
+
+const getSystemStats = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/system/stats`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch system stats");
+  return res.json();
+};
+
+const createBackup = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/system/backup`, {
+    method: "POST",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to create backup");
+  return res.json();
+};
+
+const getBackups = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/system/backups`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch backups");
+  return res.json();
+};
+
+const clearCache = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/system/clear-cache`, {
+    method: "POST",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to clear cache");
+  return res.json();
+};
+
+export const useGetSystemHealth = () =>
+  useQuery({ queryKey: ["systemHealth"], queryFn: getSystemHealth, refetchInterval: 30000 });
+
+export const useGetSystemStats = () =>
+  useQuery({ queryKey: ["systemStats"], queryFn: getSystemStats });
+
+export const useCreateBackup = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: createBackup,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["backups"] }),
+  });
+};
+
+export const useGetBackups = () =>
+  useQuery({ queryKey: ["backups"], queryFn: getBackups });
+
+export const useClearCache = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: clearCache,
+    onSuccess: () => {
+      qc.invalidateQueries();
+    },
+  });
+};
+
+// ========== ADVANCED SETTINGS ==========
+const getAdvancedSettings = async () => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/settings-advanced`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to fetch settings");
+  return res.json();
+};
+
+const updateAdvancedSetting = async ({ key, value }: { key: string; value: unknown }) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/settings-advanced/${key}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ value }),
+  });
+  if (!res.ok) throw new Error("Failed to update setting");
+  return res.json();
+};
+
+const testIntegration = async (provider: string) => {
+  const token = getAdminToken();
+  const res = await fetch(`${API_BASE}/settings-advanced/integrations/${provider}/test`, {
+    method: "POST",
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) throw new Error("Failed to test integration");
+  return res.json();
+};
+
+export const useGetAdvancedSettings = () =>
+  useQuery({ queryKey: ["advancedSettings"], queryFn: getAdvancedSettings });
+
+export const useUpdateAdvancedSetting = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: updateAdvancedSetting,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["advancedSettings"] }),
+  });
+};
+
+export const useTestIntegration = () => useMutation({ mutationFn: testIntegration });

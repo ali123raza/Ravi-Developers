@@ -1,3 +1,4 @@
+/* eslint-env node */
 import express from 'express';
 import pool from '../lib/db.js';
 import { requireAdmin } from '../middleware/auth.js';

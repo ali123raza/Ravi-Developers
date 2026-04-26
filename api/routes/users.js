@@ -1,4 +1,6 @@
+/* eslint-env node */
 import express from 'express';
+import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import pool from '../lib/db.js';
 import { requireAdmin } from '../middleware/auth.js';

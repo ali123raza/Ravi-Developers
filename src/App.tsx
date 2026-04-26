@@ -25,6 +25,16 @@ import AdminCMS from "@/views/admin/AdminCMS";
 import AdminTheme from "@/views/admin/AdminTheme";
 import AdminNavigation from "@/views/admin/AdminNavigation";
 import AdminSEO from "@/views/admin/AdminSEO";
+import AdminUsers from "@/views/admin/AdminUsers";
+import AdminGallery from "@/views/admin/AdminGallery";
+import AdminFiles from "@/views/admin/AdminFiles";
+import AdminLogs from "@/views/admin/AdminLogs";
+import AdminBookings from "@/views/admin/AdminBookings";
+import AdminCustomers from "@/views/admin/AdminCustomers";
+import AdminReports from "@/views/admin/AdminReports";
+import AdminMarketing from "@/views/admin/AdminMarketing";
+import AdminSystem from "@/views/admin/AdminSystem";
+import AdminNotifications from "@/views/admin/AdminNotifications";
 import ThemeProvider from "@/components/ThemeProvider";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
@@ -94,6 +104,36 @@ function Router() {
       <Route path="/admin/seo">
         {() => <ProtectedRoute><AdminSEO /></ProtectedRoute>}
       </Route>
+      <Route path="/admin/users">
+        {() => <ProtectedRoute><AdminUsers /></ProtectedRoute>}
+      </Route>
+      <Route path="/admin/gallery">
+        {() => <ProtectedRoute><AdminGallery /></ProtectedRoute>}
+      </Route>
+      <Route path="/admin/files">
+        {() => <ProtectedRoute><AdminFiles /></ProtectedRoute>}
+      </Route>
+      <Route path="/admin/logs">
+        {() => <ProtectedRoute><AdminLogs /></ProtectedRoute>}
+      </Route>
+      <Route path="/admin/bookings">
+        {() => <ProtectedRoute><AdminBookings /></ProtectedRoute>}
+      </Route>
+      <Route path="/admin/customers">
+        {() => <ProtectedRoute><AdminCustomers /></ProtectedRoute>}
+      </Route>
+      <Route path="/admin/reports">
+        {() => <ProtectedRoute><AdminReports /></ProtectedRoute>}
+      </Route>
+      <Route path="/admin/marketing">
+        {() => <ProtectedRoute><AdminMarketing /></ProtectedRoute>}
+      </Route>
+      <Route path="/admin/system">
+        {() => <ProtectedRoute><AdminSystem /></ProtectedRoute>}
+      </Route>
+      <Route path="/admin/notifications">
+        {() => <ProtectedRoute><AdminNotifications /></ProtectedRoute>}
+      </Route>
 
       <Route component={NotFound} />
     </Switch>
@@ -106,7 +146,7 @@ function App() {
       <AdminAuthProvider>
         <ThemeProvider>
           <TooltipProvider>
-            <WouterRouter base={(process.env.NEXT_PUBLIC_BASE_URL || "/").replace(/\/$/, "")}>
+            <WouterRouter base="/">
               <Router />
               <WhatsAppButton />
             </WouterRouter>

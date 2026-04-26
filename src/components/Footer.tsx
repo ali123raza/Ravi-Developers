@@ -1,7 +1,7 @@
 "use client";
 
 import { Link } from 'wouter';
-import { MapPin, Phone, Mail, Facebook, Instagram } from "lucide-react";
+import { MapPin, Phone, Mail, Globe } from "lucide-react";
 import { useSettings } from "@/hooks/useSettings";
 import { useGetProjects } from "@/lib/api";
 
@@ -37,11 +37,11 @@ export default function Footer() {
             <div className="flex gap-3 mt-4">
               <a href={facebook} target="_blank" rel="noopener noreferrer"
                 className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors">
-                <Facebook size={14} />
+                <Globe size={14} />
               </a>
               <a href={instagram} target="_blank" rel="noopener noreferrer"
                 className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors">
-                <Instagram size={14} />
+                <Globe size={14} />
               </a>
             </div>
           </div>

@@ -1,7 +1,9 @@
+/* eslint-env node */
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import pool, { JWT_SECRET } from '../lib/db.js';
+import pool from '../lib/db.js';
+import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -38,8 +40,8 @@ router.post('/login', async (req, res) => {
         role: user.role
       }
     });
-  } catch (error) {
-    console.error('Login error:', error);
+  } catch (err) {
+    console.error('Login error:', err);
     res.status(500).json({ error: 'Login failed' });
   }
 });
